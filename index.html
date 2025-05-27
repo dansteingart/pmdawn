@@ -108,7 +108,6 @@
             const socket = io();
 
             socket.on('pm2-updates', (updates) => {
-                console.log('Received PM2 updates:', updates);
                 updates.forEach(update => {
                     const processData = update.data;
 
