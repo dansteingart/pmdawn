@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PM2 Dashboard with DataTables</title>
+    <title>pmdawn</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -100,7 +100,8 @@
                     }
                     }                ],
                 rowId: 'pm_id',
-                iDisplayLength: -1
+                iDisplayLength: -1,
+                paging: false
 
             });
 
@@ -136,6 +137,7 @@
                     }
                 });
             });
+        $("#pm2-table_info").hide()
         });
     </script>
 </body>
