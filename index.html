@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PM2 Dashboard with DataTables</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+
+        body{
+            background: black;
+            color: grey;
+            font-family: 'monaco'
+        }
+        table.dataTable tbody tr {
+            background-color: #090909; /* Optional: Slightly different background */
+        }
+        table.dataTable tbody tr:hover {
+            background-color: #393939; /* Optional: Hover effect */
+        }
+
+
+    </style>
+</head>
+<body>
+    <table id="pm2-table" class="display">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+                <th>Status</th>
+                <th>CPU (%)</th>
+                <th>Memory (MB)</th>
+                <th>Uptime</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- DataTables will populate the table here -->
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function() {
+            let dataTable = $('#pm2-table').DataTable({
+                data: [],
+                columns: [
+                    { data: 'name', title: 'Name' },
+                    { data: 'pm_id', title: 'ID' },
+                    { data: 'pm2_env.status', title: 'Status' },
+                    { data: 'monit.cpu', title: 'CPU (%)' },
+                    { data: 'monit.memory', title: 'Memory (MB)' },
+                    { data: 'pm2_env.pm_uptime',
+                    title: 'Uptime',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            if (data) {
+                                let totalSeconds = Math.floor((Date.now() - data) / 1000);
+                                let hours = Math.floor(totalSeconds / 3600);
+                                let minutes = Math.floor((totalSeconds % 3600) / 60);
+                                let seconds = totalSeconds % 60;
+                                return hours + "h " + minutes + "m " + seconds + "s";
+                            }
+                            return "N/A";
+                        }
+                        return data; // For sorting/filtering
+                    }
+                    }                ],
+                rowId: 'pm_id'
+            });
+
+            const socket = io();
+
+            socket.on('pm2-updates', (updates) => {
+                console.log('Received PM2 updates:', updates);
+                updates.forEach(update => {
+                    const processData = update.data;
+
+                    switch (update.type) {
+                        case 'add':
+                            dataTable.row.add(processData).draw(false);
+                            break;
+
+                        case 'update':
+                            const row = dataTable.row('#' + processData.pm_id);
+                            if (row.length) {
+                                row.data(processData).draw(false);
+                            }
+                            break;
+
+                        case 'remove':
+                            const rowToRemove = dataTable.row('#' + processData.pm_id);
+                            if (rowToRemove.length) {
+                                rowToRemove.remove().draw(false);
+                            }
+                            break;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

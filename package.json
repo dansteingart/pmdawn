@@ -1,0 +1,14 @@
+{
+    "name": "pmdawn",
+    "version": "1.0.0",
+    "description": "Express / Socket.io app with exec commands",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "pm2": "^6.0.6",
+        "socket.io": "^4.6.1"
+    }
+}
