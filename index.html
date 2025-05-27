@@ -16,7 +16,7 @@
 
         #pm2-table tbody tr {
             transition: color 2s ease;
-            color: green; /* Normal color */
+            color: grey; /* Normal color */
         }
 
         /* This class temporarily sets background to light green */
@@ -60,7 +60,20 @@
                 columns: [
                     { data: 'name', title: 'Name' },
                     { data: 'pm_id', title: 'ID' },
-                    { data: 'pm2_env.status', title: 'Status' },
+                    { 
+                        data: 'pm2_env.status', 
+                        title: 'Status',
+                        render: function(data, type, row) {
+                            if (type === 'display') {
+                                if (data === 'online') {
+                                    return '<span style="color: green;">' + data + '</span>';
+                                } else {
+                                    return '<span style="color: red;">' + data + '</span>';
+                                }
+                            }
+                            return data;
+                        }
+                    },
                     { data: 'monit.cpu', title: 'CPU (%)' },
                     { data: 'monit.memory', title: 'Memory (MB)',
                         render: (data,type,row) => {
