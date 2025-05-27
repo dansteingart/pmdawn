@@ -71,15 +71,21 @@
                         }   
                      },
                     { data: 'pm2_env.pm_uptime',
-                      title: 'Uptime',
-                      render: function(data, type, row) {
+                    title: 'Uptime',
+                    render: function(data, type, row) {
                         if (type === 'display') {
-                            return data ? Math.floor((Date.now() - data) / 1000) + " sec" : "N/A";
+                            if (data) {
+                                let totalSeconds = Math.floor((Date.now() - data) / 1000);
+                                let hours = Math.floor(totalSeconds / 3600);
+                                let minutes = Math.floor((totalSeconds % 3600) / 60);
+                                let seconds = totalSeconds % 60;
+                                return hours + "h " + minutes + "m " + seconds + "s";
+                            }
+                            return "N/A";
                         }
                         return data; // For sorting/filtering
-                      }
-                    },
-                ],
+                    }
+                    }                ],
                 rowId: 'pm_id',
                 iDisplayLength: -1
 
