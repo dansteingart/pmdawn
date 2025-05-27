@@ -10,9 +10,22 @@
 
         body{
             background: black;
-            color: grey;
+            color: green;
             font-family: 'monaco'
         }
+
+        #pm2-table tbody tr {
+            transition: color 2s ease;
+            color: green; /* Normal color */
+        }
+
+        /* This class temporarily sets background to light green */
+        tr.updated {
+            color: lightblue !important;
+        }
+
+        th{ color: lightgreen;}
+
         table.dataTable tbody tr {
             background-color: #090909; /* Optional: Slightly different background */
         }
@@ -49,23 +62,24 @@
                     { data: 'pm_id', title: 'ID' },
                     { data: 'pm2_env.status', title: 'Status' },
                     { data: 'monit.cpu', title: 'CPU (%)' },
-                    { data: 'monit.memory', title: 'Memory (MB)' },
-                    { data: 'pm2_env.pm_uptime',
-                    title: 'Uptime',
-                    render: function(data, type, row) {
-                        if (type === 'display') {
-                            if (data) {
-                                let totalSeconds = Math.floor((Date.now() - data) / 1000);
-                                let hours = Math.floor(totalSeconds / 3600);
-                                let minutes = Math.floor((totalSeconds % 3600) / 60);
-                                let seconds = totalSeconds % 60;
-                                return hours + "h " + minutes + "m " + seconds + "s";
+                    { data: 'monit.memory', title: 'Memory (MB)',
+                        render: (data,type,row) => {
+                            if (type === 'display') {
+                                return (data / 1024 / 1024).toFixed(2); // Convert bytes to MB
                             }
-                            return "N/A";
+                            return data; // For sorting/filtering
+                        }   
+                     },
+                    { data: 'pm2_env.pm_uptime',
+                      title: 'Uptime',
+                      render: function(data, type, row) {
+                        if (type === 'display') {
+                            return data ? Math.floor((Date.now() - data) / 1000) + " sec" : "N/A";
                         }
                         return data; // For sorting/filtering
-                    }
-                    }                ],
+                      }
+                    },
+                ],
                 rowId: 'pm_id'
             });
 
@@ -85,6 +99,10 @@
                             const row = dataTable.row('#' + processData.pm_id);
                             if (row.length) {
                                 row.data(processData).draw(false);
+                                const rowNode = row.node();
+                                $(rowNode).addClass('updated');
+                                // Remove the class after 1 second so the row fades back to green
+                                setTimeout(() => { $(rowNode).removeClass('updated'); }, 1000);
                             }
                             break;
 
